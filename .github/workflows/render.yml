@@ -1,6 +1,15 @@
 name: Render pilot
 on:
   workflow_dispatch:
+    inputs:
+      voice_mode:
+        description: 'Dabing: vlastní hlas později v CapCutu, nebo automatický Piper'
+        type: choice
+        required: true
+        default: manual
+        options:
+          - manual
+          - ai
 permissions:
   contents: read
 concurrency:
@@ -10,6 +19,8 @@ jobs:
   render:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    env:
+      VOICE_MODE: ${{ inputs.voice_mode }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -18,50 +29,63 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install ffmpeg + Piper (free, on GitHub runner)
+      - name: Install FFmpeg
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
-          python -m pip install --disable-pip-version-check 'piper-tts>=1.2,<2'
-      - name: Download open Czech voice model
+      - name: Install Piper for automated narration
+        if: ${{ inputs.voice_mode == 'ai' }}
+        run: python -m pip install --disable-pip-version-check 'piper-tts>=1.2,<2'
+      - name: Download Czech voice model
+        if: ${{ inputs.voice_mode == 'ai' }}
         run: |
           mkdir -p .voice-model
           base='https://huggingface.co/rhasspy/piper-voices/resolve/main/cs/cs_CZ/jirka/medium'
           curl --fail --location --retry 3 --silent --show-error "$base/cs_CZ-jirka-medium.onnx" -o .voice-model/cs_CZ-jirka-medium.onnx
           curl --fail --location --retry 3 --silent --show-error "$base/cs_CZ-jirka-medium.onnx.json" -o .voice-model/cs_CZ-jirka-medium.onnx.json
           test "$(wc -c < .voice-model/cs_CZ-jirka-medium.onnx)" -gt 30000000
-      - name: Generate Czech voice and original soundtrack
+      - name: Prepare optional narration
+        if: ${{ inputs.voice_mode == 'ai' }}
+        run: python scripts/generate_voice.py
+      - name: Generate original ambient and effects
         run: |
-          python scripts/generate_voice.py
-          python scripts/mix_audio.py
-      - name: Render animation on cloud runner
+          if [ "$VOICE_MODE" = 'manual' ]; then
+            python scripts/mix_audio.py --no-voice
+          else
+            python scripts/mix_audio.py
+          fi
+      - name: Render animation in cloud
         run: |
           npm install
           npx remotion browser ensure
           mkdir -p out
           npm run render
-      - name: Add soundtrack and Czech voice to MP4
+      - name: Merge video and sound
         run: |
           ffmpeg -hide_banner -loglevel error -y \
             -i out/pilot.mp4 -i out/soundtrack.wav \
             -map 0:v:0 -map 1:a:0 -c:v copy \
             -c:a aac -b:a 160k -shortest -movflags +faststart out/pilot-final.mp4
           mv out/pilot-final.mp4 out/pilot.mp4
-      - name: Verify final MP4 (resolution, fps, duration, audio)
+      - name: Verify render
         run: python scripts/check_output.py out/pilot.mp4
-      - name: Generate cover and Czech posting text
+      - name: Export cover, caption, timed narration and subtitles
         run: |
           ffmpeg -hide_banner -loglevel error -y -ss 26 \
             -i out/pilot.mp4 -frames:v 1 -q:v 3 out/cover.jpg
-          python scripts/create_exports.py
+          python scripts/create_exports.py --voice-mode "$VOICE_MODE"
           test -s out/cover.jpg
           test -s out/popisek.txt
+          test -s out/scenar-pro-dabing.txt
+          test -s out/dabing-casovani.srt
       - uses: actions/upload-artifact@v4
         with:
-          name: story-studio-pilot-a2-cz
+          name: story-studio-pilot-a3-${{ inputs.voice_mode }}
           path: |
             out/pilot.mp4
             out/cover.jpg
             out/popisek.txt
+            out/scenar-pro-dabing.txt
+            out/dabing-casovani.srt
           retention-days: 1
           if-no-files-found: error

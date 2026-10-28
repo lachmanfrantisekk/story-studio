@@ -95,7 +95,7 @@ def generate(show_without_voice=False, dest=None):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--test-no-voice', action='store_true', help='Offline test own SFX only (not production)')
+    parser.add_argument('--no-voice', '--test-no-voice', action='store_true', help='Export only atmosphere and effects without narration (for recording your voice later)')
     parser.add_argument('--output', type=Path)
     args = parser.parse_args()
-    generate(show_without_voice=args.test_no_voice, dest=args.output)
+    generate(show_without_voice=args.no_voice, dest=args.output)

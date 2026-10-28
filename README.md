@@ -1,57 +1,53 @@
-# Story Studio — pilot A2: český hlas + původní zvuky
+# Story Studio — etapa A3: volba dabingu (vlastní hlas / automatický Piper)
 
-Pokračování úspěšně cloudově vyrenderovaného vizuálního prototypu „Poslední signál“.
-Zachovává 6 animovaných scén, 1080×1920, 30 FPS, 75 sekund. Přidává český
-hlas Piper (`cs_CZ-jirka-medium`) a původní procedurálně syntetizovaný ambient,
-kroky a upozornění telefonu. Nepoužívá žádnou placenou službu ani žádné cizí
-hudební nahrávky. Vše se generuje na GitHub Actions runneru, NE na notebooku.
+Tato aktualizace **zachovává animovaný pilot** „Poslední signál“ a jeho původní
+šest scén. Nově jde při spuštění workflow vybrat, zda chceš vlastní hlas pro
+nahrání v CapCutu, nebo automatický český hlas Piper.
 
-## Nasazení na GitHub — bez terminálu
+## Co bude v ZIPu s výsledkem
 
-1. Otevři svůj veřejný repozitář `story-studio` a přepni na větev `main`.
-2. Nahraj **obsah rozbaleného ZIPu** do kořene repozitáře. Přepiš existující
-   `README.md`, `package.json`, `src/index.jsx` (pokud se změnil),
-   `.github/workflows/render.yml`; přidej `storyboard.json`, `scripts/` a
-   `.gitignore`. `.github` může být skrytá složka ve Windows (zapni skryté soubory).
-3. Pokud GitHub web neumí nahrát do `.github/workflows/` nebo zachovat adresáře,
-   použij GitHub Desktop: rozbal ZIP přímo do lokální složky repozitáře,
-   **Commit to main** → **Push origin**.
-4. Záložka **Actions** → **Render pilot** → **Run workflow** → zelené **Run workflow**.
-5. Otevři poslední běh. Po zeleném dokončení v **Artifacts** stáhni
-   `story-studio-pilot-a2-cz` a rozbal `pilot.mp4`, `cover.jpg` a `popisek.txt`.
-6. Pusť video **se zvukem**. Ověř srozumitelnost českého hlasu a zvukové efekty.
-   Pokud je běh červený, otevři červený krok a pošli chybovou hlášku.
+- `pilot.mp4` — 75 s / 1080 × 1920 / 30 FPS / animace + ambient a zvukové efekty.
+- `scenar-pro-dabing.txt` — celý český text vypravěče, scény a orientační časy.
+- `dabing-casovani.srt` — časované repliky vypravěče jako samostatný soubor.
+- `cover.jpg` — obálka získaná z videa.
+- `popisek.txt` — popisek pro sociální sítě.
 
-## Co dělají soubory
+Režim `manual` **neobsahuje žádný AI hlas**, pouze ambient a efekty. Režim `ai`
+se navíc pokusí nainstalovat Piper, stáhnout volně dostupný český hlas a
+vložit ho do výsledného videa. Soubor scénáře dostaneš **v obou režimech**.
+Vlastní hlas pak do MP4 nahraješ v CapCutu, případně upravíš hlasitost pozadí.
+Titulky se již vykreslují přímo do videa; SRT je samostatná pomůcka pro hlas,
+nikoli automaticky editovatelná kopie vypálených titulků.
 
-- `storyboard.json` — texty pro titulky, dabing a šest scén na jednom místě.
-- `src/index.jsx` — animační obraz (zachovaný osvědčený základ).
-- `scripts/generate_voice.py` — spouští Piper pro šest českých vět.
-- `scripts/mix_audio.py` — skládá hlas a autorské efekty do 75s WAV.
-- `scripts/check_output.py` — ověřuje MP4 s videem a zvukem.
-- `scripts/create_exports.py` — vytvoří český návrh popisku a hashtagů.
-- FFmpeg vyexportuje `cover.jpg` ze skutečného videa.
-- `.github/workflows/render.yml` — vše vykoná v GitHub Actions.
+## Aktualizace na GitHubu bez terminálu
 
-## Rozpočet a soukromí
+1. Stáhni a rozbal tento ZIP.
+2. V GitHub Desktop otevři lokální složku svého repozitáře `story-studio`.
+3. **Zkopíruj obsah** ZIPu do kořene repozitáře a potvrď přepsání souborů.
+4. GitHub Desktop → `Commit to main` → `Push origin`.
+5. GitHub → tvůj repozitář → `Actions` → `Render pilot` → `Run workflow`.
+6. V rozbalovací volbě **voice_mode** vyber `manual` (vlastní dabing)
+   nebo `ai` (automatický Piper), větev nech `main`, potvrď `Run workflow`.
+7. Po zeleném dokončení otevři běh, v **Artifacts** stáhni
+   `story-studio-pilot-a3-manual` nebo `story-studio-pilot-a3-ai`.
+8. Rozbal ZIP a otevři `scenar-pro-dabing.txt`. Pro CapCut importuj `pilot.mp4`.
+   Vlož vlastní audio (Record / Voiceover) a řiď se časy v scénáři.
 
-Ve workflow nejsou klíče, API ani nákup kreditů. Výstupní MP4 a logy Actions
-mohou být ve veřejném repozitáři veřejně dostupné. Výstup se uchovává 1 den.
-Hlasový model se stahuje při každém spuštění; požaduje síťové připojení GitHub
-runneru a Hugging Face. Počet běhů spouštěj ručně — běh se při chybě automaticky
-neopakuje.
+## Bezpečnost, licence a limity
 
-## Licence
+Není použit žádný placený cloud ani API klíče. Rendering probíhá v GitHub
+Actions, nic se nerenderuje na notebooku. V `manual` se nestahuje model Piper.
+U veřejného repozitáře počítej s viditelností běhů, logů a možná i artifactů.
+Výsledky workflow se uchovávají jeden den. GitHub Actions mají své provozní
+podmínky a kapacitní limity, nejde o garantovanou neomezenou službu.
 
-Piper `cs_CZ-jirka-medium`: původní MODEL_CARD uvádí dataset CC0. Repozitář
-rhasspy/piper-voices má vlastní licenci; řiď se i podmínkami použitého
-softwaru. Zvukové efekty a atmosférická stopa jsou vytvořeny algoritmicky
-ze zdrojového kódu tohoto projektu, bez stažených samplů.
+Model `cs_CZ-jirka-medium` se stahuje z rhasspy/piper-voices; použití
+konkrétního hlasu a licence je před zveřejněním nutné ověřit u zdroje.
+Ambient a zvukové efekty generuje Python bez převzatých hudebních nahrávek.
 
-## Testování
+## Testování a stav
 
-Původní pilot byl podle uživatelské kontroly z GitHub Actions funkční (7/7).
-Tato aktualizace má nové kroky s dabingem a musí být ověřena **novým** během
-GitHub Actions. Lokální testy scripts lze provést bez instalace Piper s volbou
-`python scripts/mix_audio.py --test-no-voice`; to však nenahrazuje reálný TTS test.
-Není hotová administrace (etapa B) ani AI generátor postav (etapa C).
+Původní video bylo uživatelem zkontrolováno (7/7). Nové generování scénáře,
+SRT a ambientu lze testovat lokálně bez renderu. **Aktualizovaný Remotion render
+v GitHub Actions ani skutečný Piper TTS nejsou zatím nezávisle ověřené.**
+Při červeném běhu otevři selhaný krok a zkopíruj chybovou zprávu.
