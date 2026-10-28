@@ -1,57 +1,28 @@
-# Story Studio — etapa A3: volba dabingu (vlastní hlas / automatický Piper)
+# MIMO SIGNÁL — A6: nová grafická vrstva (navazuje na A5)
 
-Tato aktualizace **zachovává animovaný pilot** „Poslední signál“ a jeho původní
-šest scén. Nově jde při spuštění workflow vybrat, zda chceš vlastní hlas pro
-nahrání v CapCutu, nebo automatický český hlas Piper.
+**Pilot „Poslední signál“** — 75 s, 1080 × 1920, 30 FPS. Režie a 24 záběrů z A5 zůstávají, přidává se originální kreslený 2.5D svět a propracovanější animovaná postava. Zvuk zůstává v režimech `manual` a `ai`.
 
-## Co bude v ZIPu s výsledkem
+## Nasazení (GitHub Desktop)
 
-- `pilot.mp4` — 75 s / 1080 × 1920 / 30 FPS / animace + ambient a zvukové efekty.
-- `scenar-pro-dabing.txt` — celý český text vypravěče, scény a orientační časy.
-- `dabing-casovani.srt` — časované repliky vypravěče jako samostatný soubor.
-- `cover.jpg` — obálka získaná z videa.
-- `popisek.txt` — popisek pro sociální sítě.
+1. Rozbal ZIP a zkopíruj všechny soubory a složky **z jeho kořene** do kořene svého repozitáře `story-studio`. Potvrď přepsání.
+2. V GitHub Desktop zkontroluj změny, klikni `Commit to main` a `Push origin`.
+3. Na GitHubu otevři `Actions` → `MIMO SIGNÁL | Render pilot` → `Run workflow`.
+4. Ponech `main`; pro vlastní hlas v CapCutu vyber `manual`, pro Piper `ai`.
+5. Po úspěšném doběhnutí stáhni ZIP z `Artifacts` (název `mimo-signal-part01-manual` nebo `mimo-signal-part01-ai`).
+6. Ve výsledku najdeš `pilot.mp4`, `cover.jpg`, `cover.png`, `popisek.txt`, `scenar-pro-dabing.txt` a `dabing-casovani.srt`.
+7. Posuď obraz a plynulost pohybu na telefonu, ne jen ze zmenšeného náhledu. Případné chyby pošli jako screenshot z červeného kroku GitHub Actions.
 
-Režim `manual` **neobsahuje žádný AI hlas**, pouze ambient a efekty. Režim `ai`
-se navíc pokusí nainstalovat Piper, stáhnout volně dostupný český hlas a
-vložit ho do výsledného videa. Soubor scénáře dostaneš **v obou režimech**.
-Vlastní hlas pak do MP4 nahraješ v CapCutu, případně upravíš hlasitost pozadí.
-Titulky se již vykreslují přímo do videa; SRT je samostatná pomůcka pro hlas,
-nikoli automaticky editovatelná kopie vypálených titulků.
+## Co je nové
 
-## Aktualizace na GitHubu bez terminálu
+- `src/visuals.jsx`: originální vícevrstvý les, světlo, mlha, vzdálená hláska, detaily vegetace, kreslená postava Adam s animačním rigem.
+- `public/grain.png`: slabé filmové zrno (vygenerované lokálně).
+- `src/index.jsx`: nové prostředí a postava vložené do všech 24 záběrů, aktualizovaný cover.
+- `VIZUALNI-REVIZE-A6.md`: popis grafických změn a jejich limitů.
 
-1. Stáhni a rozbal tento ZIP.
-2. V GitHub Desktop otevři lokální složku svého repozitáře `story-studio`.
-3. **Zkopíruj obsah** ZIPu do kořene repozitáře a potvrď přepsání souborů.
-4. GitHub Desktop → `Commit to main` → `Push origin`.
-5. GitHub → tvůj repozitář → `Actions` → `Render pilot` → `Run workflow`.
-6. V rozbalovací volbě **voice_mode** vyber `manual` (vlastní dabing)
-   nebo `ai` (automatický Piper), větev nech `main`, potvrď `Run workflow`.
-7. Po zeleném dokončení otevři běh, v **Artifacts** stáhni
-   `story-studio-pilot-a3-manual` nebo `story-studio-pilot-a3-ai`.
-8. Rozbal ZIP a otevři `scenar-pro-dabing.txt`. Pro CapCut importuj `pilot.mp4`.
-   Vlož vlastní audio (Record / Voiceover) a řiď se časy v scénáři.
+## Ověření
 
-## Bezpečnost, licence a limity
+Proběhla lokální kontrola JSX přes TypeScript parser/transpiler, kontrola konfigurace a vytvoření 12 statických snímků z vykreslených komponent v Chromium bez runtime chyb. **Plný Remotion render ani nový MP4 jsme zde zatím nespustili** (instalace závislostí v tomto prostředí nedoběhla). Cloudový render po nahrání je nezbytný finální test. Notebook uživatele nic nerenderuje.
 
-Není použit žádný placený cloud ani API klíče. Rendering probíhá v GitHub
-Actions, nic se nerenderuje na notebooku. V `manual` se nestahuje model Piper.
-U veřejného repozitáře počítej s viditelností běhů, logů a možná i artifactů.
-Výsledky workflow se uchovávají jeden den. GitHub Actions mají své provozní
-podmínky a kapacitní limity, nejde o garantovanou neomezenou službu.
+## Bezpečnost
 
-Model `cs_CZ-jirka-medium` se stahuje z rhasspy/piper-voices; použití
-konkrétního hlasu a licence je před zveřejněním nutné ověřit u zdroje.
-Ambient a zvukové efekty generuje Python bez převzatých hudebních nahrávek.
-
-## Testování a stav
-
-Původní video bylo uživatelem zkontrolováno (7/7). Nové generování scénáře,
-SRT a ambientu lze testovat lokálně bez renderu. **Aktualizovaný Remotion render
-v GitHub Actions ani skutečný Piper TTS nejsou zatím nezávisle ověřené.**
-Při červeném běhu otevři selhaný krok a zkopíruj chybovou zprávu.
-
-## Etapa A5 — režijní revize
-
-Nový `src/index.jsx` obsahuje 24 záběrů (2–4 s), střih mezi prostředím, akcí, detaily telefonu a reakcemi postavy. `REZIE-A5.md` vysvětluje provedené změny a otevřené vizuální limity. Původní šestice scénářových segmentů a export scénáře pro vlastní dabing zůstávají beze změny. Nainstalování závislostí a render probíhají výhradně na GitHub Actions.
+Bez placených API, bez API klíčů. Nepřidávej do veřejného repozitáře tajné klíče nebo soukromé příběhy. U veřejných GitHub Actions počítej s viditelnými logy a artifacts. Uchovávání artifacts je v workflow nastaveno na 1 den.

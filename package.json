@@ -1,6 +1,6 @@
 {
   "name": "mimo-signal-pilot",
-  "version": "0.4.0",
+  "version": "0.6.0",
   "private": true,
   "scripts": {
     "render": "remotion render src/index.jsx Pilot out/pilot.mp4 --codec h264 --crf 20",
