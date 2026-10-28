@@ -1,42 +1,57 @@
-# MIMO SIGNÁL — Etapa A4: identita, filmový cover a závěrečná obrazovka
+# Story Studio — etapa A3: volba dabingu (vlastní hlas / automatický Piper)
 
-**MIMO SIGNÁL** je veřejná značka originálních českých animovaných příběhů. Cílový handle: **@mimosignal** (dostupnost ověř před registrací). Claim: **Příběhy za hranicí reality.**
+Tato aktualizace **zachovává animovaný pilot** „Poslední signál“ a jeho původní
+šest scén. Nově jde při spuštění workflow vybrat, zda chceš vlastní hlas pro
+nahrání v CapCutu, nebo automatický český hlas Piper.
 
-## Co je nového proti A3
+## Co bude v ZIPu s výsledkem
 
-- Nové SVG logo a wordmark ve složce `assets/`.
-- Ve videu se zobrazuje MIMO SIGNÁL místo Story Studio.
-- V posledních **2,5 s** (uvnitř původních 75 s) závěrečná obrazovka s otázkou a případným teaserem na další part.
-- Skutečný cover z Remotion kompozice `Cover`: hook, filmová ilustrace, název série a `PART 01`. Není to obyčejný screenshot ze scény.
-- `storyboard.json` obsahuje metainformace o značce, pokračování a coveru.
-- Popisek, scénář pro vlastní dabing a SRT se tvoří ze storyboardu a používají jméno MIMO SIGNÁL.
-- Dva dabingové režimy z A3 zůstávají: `manual` (vlastní hlas v CapCutu), `ai` (Piper).
-- Žádné klíče, přihlášení ani placené služby se nedoplňují.
+- `pilot.mp4` — 75 s / 1080 × 1920 / 30 FPS / animace + ambient a zvukové efekty.
+- `scenar-pro-dabing.txt` — celý český text vypravěče, scény a orientační časy.
+- `dabing-casovani.srt` — časované repliky vypravěče jako samostatný soubor.
+- `cover.jpg` — obálka získaná z videa.
+- `popisek.txt` — popisek pro sociální sítě.
 
-## Jak aktualizovat GitHub — bez terminálu
+Režim `manual` **neobsahuje žádný AI hlas**, pouze ambient a efekty. Režim `ai`
+se navíc pokusí nainstalovat Piper, stáhnout volně dostupný český hlas a
+vložit ho do výsledného videa. Soubor scénáře dostaneš **v obou režimech**.
+Vlastní hlas pak do MP4 nahraješ v CapCutu, případně upravíš hlasitost pozadí.
+Titulky se již vykreslují přímo do videa; SRT je samostatná pomůcka pro hlas,
+nikoli automaticky editovatelná kopie vypálených titulků.
 
-1. Rozbal soubor ZIP s A4.
-2. Otevři GitHub Desktop a svůj lokální repozitář `story-studio` (nemusíš ho přejmenovat).
-3. Klikni na **Repository → Show in Explorer**.
-4. Zkopíruj **obsah** rozbalené složky A4 do kořene repozitáře. Potvrď přepsání souborů.
-5. V GitHub Desktop napiš třeba `MIMO SIGNAL A4 - branding` a klikni **Commit to main** a potom **Push origin**.
-6. Na GitHubu otevři **Actions → MIMO SIGNÁL | Render pilot → Run workflow**.
-7. Vyber `manual` (pokud si chceš hlas nahrát sám) nebo `ai`, větev `main`, pak zelené **Run workflow**.
-8. Po úspěšném dokončení otevři běh a stáhni **Artifacts → mimo-signal-part01-manual** (nebo `-ai`).
-9. Rozbal ZIP. Najdeš `pilot.mp4`, `cover.jpg`, `cover.png`, `popisek.txt`, `scenar-pro-dabing.txt`, `dabing-casovani.srt`.
-10. `pilot.mp4` můžeš vložit do CapCutu. `cover.jpg` použij jako náhled. Dabing namluv podle scénáře.
+## Aktualizace na GitHubu bez terminálu
 
-## Nastavení dalších příběhů
+1. Stáhni a rozbal tento ZIP.
+2. V GitHub Desktop otevři lokální složku svého repozitáře `story-studio`.
+3. **Zkopíruj obsah** ZIPu do kořene repozitáře a potvrď přepsání souborů.
+4. GitHub Desktop → `Commit to main` → `Push origin`.
+5. GitHub → tvůj repozitář → `Actions` → `Render pilot` → `Run workflow`.
+6. V rozbalovací volbě **voice_mode** vyber `manual` (vlastní dabing)
+   nebo `ai` (automatický Piper), větev nech `main`, potvrď `Run workflow`.
+7. Po zeleném dokončení otevři běh, v **Artifacts** stáhni
+   `story-studio-pilot-a3-manual` nebo `story-studio-pilot-a3-ai`.
+8. Rozbal ZIP a otevři `scenar-pro-dabing.txt`. Pro CapCut importuj `pilot.mp4`.
+   Vlož vlastní audio (Record / Voiceover) a řiď se časy v scénáři.
 
-V `storyboard.json` lze upravit `series.title`, `series.coverHook`, `series.part`, `series.endHook`, `series.nextPart`, `series.endPrompt` a `series.nextPartPlanned`.
+## Bezpečnost, licence a limity
 
-- `nextPartPlanned: true` → zobrazí číslo pokračování.
-- `nextPartPlanned: false` → zobrazí samostatný konec. Nepředstírá pokračování.
+Není použit žádný placený cloud ani API klíče. Rendering probíhá v GitHub
+Actions, nic se nerenderuje na notebooku. V `manual` se nestahuje model Piper.
+U veřejného repozitáře počítej s viditelností běhů, logů a možná i artifactů.
+Výsledky workflow se uchovávají jeden den. GitHub Actions mají své provozní
+podmínky a kapacitní limity, nejde o garantovanou neomezenou službu.
 
-Poznámka: současné postavy a prostředí jsou stále **původní SVG pilot**, nikoliv automaticky AI vytvořená grafika podle přiložených referencí. Nová grafická úroveň je další vývojová fáze. Zvuk, střih a skutečná animace zůstávají založené na původním prototypu.
+Model `cs_CZ-jirka-medium` se stahuje z rhasspy/piper-voices; použití
+konkrétního hlasu a licence je před zveřejněním nutné ověřit u zdroje.
+Ambient a zvukové efekty generuje Python bez převzatých hudebních nahrávek.
 
-## Omezení a stav testů
+## Testování a stav
 
-Základ A3 už byl funkčně prověřován. Úprava A4 zachovává parametry 75 s, 1080×1920, 30 FPS. Nový cover se generuje pomocí `npx remotion still`; konečný cloudový render musíš teprve ověřit v Actions. Zelená Actions ještě sama o sobě neurčuje uměleckou kvalitu výsledku.
+Původní video bylo uživatelem zkontrolováno (7/7). Nové generování scénáře,
+SRT a ambientu lze testovat lokálně bez renderu. **Aktualizovaný Remotion render
+v GitHub Actions ani skutečný Piper TTS nejsou zatím nezávisle ověřené.**
+Při červeném běhu otevři selhaný krok a zkopíruj chybovou zprávu.
 
-Veřejný GitHub repozitář: logy a artifacts mohou být veřejně přístupné. Žádný privátní obsah ani tajné klíče do projektu nenahrávej.
+## Etapa A5 — režijní revize
+
+Nový `src/index.jsx` obsahuje 24 záběrů (2–4 s), střih mezi prostředím, akcí, detaily telefonu a reakcemi postavy. `REZIE-A5.md` vysvětluje provedené změny a otevřené vizuální limity. Původní šestice scénářových segmentů a export scénáře pro vlastní dabing zůstávají beze změny. Nainstalování závislostí a render probíhají výhradně na GitHub Actions.
