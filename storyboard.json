@@ -1,0 +1,46 @@
+{
+  "project": "Story Studio — Poslední signál",
+  "language": "cs-CZ",
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "secondsPerScene": 12.5,
+  "scenes": [
+    {
+      "title": "CESTA DOMŮ",
+      "caption": "Ve dvě ráno procházel Adam opuštěným lesem.",
+      "narration": "Byly dvě hodiny ráno. Adam se vracel domů opuštěným lesem.",
+      "action": "walk"
+    },
+    {
+      "title": "ZPRÁVA",
+      "caption": "Telefon zavibroval. Zpráva přišla z jeho vlastního čísla.",
+      "narration": "Náhle mu zavibroval telefon. Zpráva přišla z jeho vlastního čísla.",
+      "action": "phone"
+    },
+    {
+      "title": "NEOTÁČEJ SE",
+      "caption": "Na displeji stálo jediné: Neotáčej se.",
+      "narration": "Na displeji stálo jen jediné. Neotáčej se.",
+      "action": "freeze"
+    },
+    {
+      "title": "KROKY",
+      "caption": "Za zády uslyšel kroky. Zrychlil. Pak se rozběhl.",
+      "narration": "Za zády zaslechl kroky. Přidal do kroku. A pak se rozběhl.",
+      "action": "run"
+    },
+    {
+      "title": "POLOHA",
+      "caption": "Na mapě svítila dvě místa. Obě měla jeho jméno.",
+      "narration": "Otevřel mapu. Dvě blikající tečky. Obě se jmenovaly Adam.",
+      "action": "phone-run"
+    },
+    {
+      "title": "POSLEDNÍ SIGNÁL",
+      "caption": "Druhá tečka stála přímo za ním. Obraz zhasl.",
+      "narration": "Druhá tečka se zastavila přímo za ním. A potom zhaslo světlo.",
+      "action": "blackout"
+    }
+  ]
+}
