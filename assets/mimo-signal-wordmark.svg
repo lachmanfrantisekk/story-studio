@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1300" height="300" viewBox="0 0 1300 300" role="img" aria-label="MIMO SIGNÁL">
+ <rect width="1300" height="300" rx="48" fill="#081524"/>
+ <g fill="none" stroke="#64eadf" stroke-width="17" stroke-linecap="round"><path d="M77 122a88 88 0 0 1 142-10"/><path d="M108 154a51 51 0 0 1 79-7"/></g>
+ <circle cx="152" cy="183" r="15" fill="#64eadf"/><path d="M191 64l-31 70" stroke="#ff687b" stroke-width="20" stroke-linecap="round"/>
+ <text x="278" y="178" font-family="Arial, Helvetica, sans-serif" font-size="110" font-weight="900" letter-spacing="7" fill="#ecfbff">MIMO SIGNÁL</text>
+</svg>

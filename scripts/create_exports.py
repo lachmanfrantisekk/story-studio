@@ -1,26 +1,36 @@
 #!/usr/bin/env python3
-"""Create social caption, human-readable voice-over script, and importable SRT."""
+"""Export branding-aware Czech publication copy, script, and SRT."""
 from pathlib import Path
 import argparse
 import json
 
-root = Path(__file__).resolve().parents[1]
-story = json.loads((root / 'storyboard.json').read_text(encoding='utf-8'))
-out = root / 'out'
-out.mkdir(exist_ok=True)
+ROOT = Path(__file__).resolve().parents[1]
+STORY = json.loads((ROOT / 'storyboard.json').read_text(encoding='utf-8'))
+OUT = ROOT / 'out'
+OUT.mkdir(parents=True, exist_ok=True)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--voice-mode', choices=['manual', 'ai'], default='manual')
 args = parser.parse_args()
 
-(out / 'popisek.txt').write_text(
-    'POSLEDNÍ SIGNÁL 🌲📱\n\n'
-    'Když ti ve dvě ráno přijde zpráva z vlastního čísla… otočíš se?\n\n'
-    'Co bys udělal/a ty? Napiš do komentářů.\n\n'
-    '#CeskePribehy #Zahady #Horor #Mystery #AnimovanyPribeh #Shorts #Reels\n\n'
-    'Obsah: originální fikce · Story Studio\n',
-    encoding='utf-8'
+series = STORY['series']
+brand = STORY['brand']
+part = int(series['part'])
+next_part = series.get('nextPart')
+next_planned = bool(series.get('nextPartPlanned', False)) and isinstance(next_part, int)
+headline = series['coverHook']
+
+caption = (
+    f'{brand["name"]} · {series["title"]} — PART {part:02d}\n\n'
+    f'{headline}\n\n'
+    'Co bys udělal/a na Adamově místě? 👀\n'
+    + (f'Pokračování PART {next_part:02d} připravujeme. Sleduj {brand["handle"]}.\n\n'
+       if next_planned else f'Jak si vysvětluješ ten konec? Napiš do komentářů. Sleduj {brand["handle"]}.\n\n')
+    + '#MimoSignal #CeskePribehy #Zahady #Horor #Mystery #AnimovanePribehy #Shorts #Reels\n\n'
+    + 'Originální fiktivní příběh.\n'
 )
+(OUT / 'popisek.txt').write_text(caption, encoding='utf-8')
+
 
 def stamp(seconds):
     ms = round(seconds * 1000)
@@ -29,37 +39,42 @@ def stamp(seconds):
     ss, milli = divmod(rem, 1000)
     return f'{hh:02}:{mm:02}:{ss:02},{milli:03}'
 
+
+scene_seconds = float(STORY['secondsPerScene'])
+full_length = len(STORY['scenes']) * scene_seconds
+end_card = float(STORY.get('endCardSeconds', 2.5))
+spoken_end = full_length - end_card
 narration = []
 srt = []
-scene_seconds = float(story['secondsPerScene'])
-for i, scene in enumerate(story['scenes']):
+for i, scene in enumerate(STORY['scenes']):
     start = i * scene_seconds
     end = start + scene_seconds
-    # Same 1.5s lead-in as the AI voice mixer. Leave a safety gap for narration.
     voice_start = start + 1.5
-    voice_end = end - 0.25
+    voice_end = min(end - 0.25, spoken_end - 0.1)
+    if voice_end <= voice_start:
+        raise ValueError(f'V poslední scéně není dost času na hlas: {i+1}')
     narration.append(
         f'{i+1}. SCÉNA — {scene["title"]}\n'
-        f'Čas scény: {stamp(start)} – {stamp(end)}\n'
-        f'Doporučený začátek hlasu: {stamp(voice_start)}\n'
-        f'Mluv nejpozději do: {stamp(voice_end)}\n'
-        f'Text vypravěče: {scene["narration"]}\n'
-        f'Titulek ve videu: {scene["caption"]}\n'
+        f'Čas: {stamp(start)} – {stamp(end)}\n'
+        f'Doporučené okno hlasu: {stamp(voice_start)} – {stamp(voice_end)}\n'
+        f'Text dabingu: {scene["narration"]}\n'
+        f'Text titulku: {scene["caption"]}\n'
     )
-    # SRT is a timing guide for voice-over narration, not for burnt-in captions.
     srt.append(f'{i+1}\n{stamp(voice_start)} --> {stamp(voice_end)}\n{scene["narration"]}\n')
 
 header = (
-    f'STORY STUDIO — SCÉNÁŘ K VLASTNÍMU DABINGU\n'
-    f'{story["project"]}\n'
-    f'Délka: {len(story["scenes"]) * scene_seconds:g} sekund | Jazyk: čeština\n'
-    f'Režim exportu: {"vlastní dabing / CapCut" if args.voice_mode == "manual" else "AI hlas Piper"}\n\n'
-    'NÁVOD: Otevři pilot.mp4 v CapCutu, vlož vlastní voice-over podle časů níže.\n'
-    'Video obsahuje ambient a efekty. V režimu manual NEMÁ AI vypravěče.\n'
-    'Soubor dabing-casovani.srt lze případně importovat jako časovou pomůcku.\n'
-    'Dynamické titulky jsou už součástí obrazu; SRT obsahuje text vypravěče.\n'
-    'Časová okna jsou orientační — před finálním exportem zkontroluj návaznost.\n\n'
+    f'{brand["name"]} — SCÉNÁŘ PRO DABING\n'
+    f'{series["title"]} / PART {part:02d} / {series["episodeCode"]}\n'
+    f'Délka videa: {full_length:g} s; závěrečná obrazovka: posledních {end_card:g} s.\n'
+    f'Režim: {"vlastní hlas v CapCutu" if args.voice_mode == "manual" else "AI hlas Piper"}.\n\n'
+    'Postup: Otevři MP4 v CapCutu a nahraj vlastní hlas dle časů.\n'
+    'Pozor: Titulky jsou přímo v obrazu. SRT je časová pomůcka pro dabing.\n'
+    'Poslední hlasové okno končí před závěrečnou obrazovkou.\n\n'
 )
-(out / 'scenar-pro-dabing.txt').write_text(header + '\n'.join(narration), encoding='utf-8')
-(out / 'dabing-casovani.srt').write_text('\n'.join(srt) + '\n', encoding='utf-8')
-print('Exporty: popisek.txt, scenar-pro-dabing.txt, dabing-casovani.srt')
+footer = (
+    f'\nZÁVĚREČNÁ OBRAZOVKA: {series["endHook"]}\n'
+    + (f'PART {next_part:02d} — {series["endPrompt"]}\n' if next_planned else 'KONEC PŘÍBĚHU\n')
+)
+(OUT / 'scenar-pro-dabing.txt').write_text(header + '\n'.join(narration) + footer, encoding='utf-8')
+(OUT / 'dabing-casovani.srt').write_text('\n'.join(srt) + '\n', encoding='utf-8')
+print('Exporty MIMO SIGNÁL připraveny: popisek, scénář, SRT')

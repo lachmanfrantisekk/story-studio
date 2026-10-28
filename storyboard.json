@@ -1,10 +1,27 @@
 {
-  "project": "Story Studio — Poslední signál",
+  "project": "MIMO SIGNÁL — Poslední signál",
+  "brand": {
+    "name": "MIMO SIGNÁL",
+    "handle": "@mimosignal",
+    "tagline": "Příběhy za hranicí reality."
+  },
+  "series": {
+    "title": "POSLEDNÍ SIGNÁL",
+    "part": 1,
+    "nextPart": 2,
+    "episodeCode": "MS-001",
+    "genre": "MYSTERY / HOROR",
+    "coverHook": "PŘIŠLA MU ZPRÁVA OD SEBE SAMÉHO.",
+    "endHook": "KDO STÁL ZA NÍM?",
+    "endPrompt": "POKRAČOVÁNÍ PŘÍŠTĚ",
+    "nextPartPlanned": true
+  },
   "language": "cs-CZ",
   "fps": 30,
   "width": 1080,
   "height": 1920,
   "secondsPerScene": 12.5,
+  "endCardSeconds": 2.5,
   "scenes": [
     {
       "title": "CESTA DOMŮ",

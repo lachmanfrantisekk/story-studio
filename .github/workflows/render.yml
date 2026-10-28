@@ -1,4 +1,4 @@
-name: Render pilot
+name: MIMO SIGNÁL | Render pilot
 on:
   workflow_dispatch:
     inputs:
@@ -13,7 +13,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: story-studio-pilot-render
+  group: mimo-signal-render
   cancel-in-progress: false
 jobs:
   render:
@@ -29,6 +29,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Validate episode configuration
+        run: python scripts/validate_project.py
       - name: Install FFmpeg
         run: |
           sudo apt-get update -qq
@@ -69,10 +71,10 @@ jobs:
           mv out/pilot-final.mp4 out/pilot.mp4
       - name: Verify render
         run: python scripts/check_output.py out/pilot.mp4
-      - name: Export cover, caption, timed narration and subtitles
+      - name: Export cinematic cover, caption, script and subtitles
         run: |
-          ffmpeg -hide_banner -loglevel error -y -ss 26 \
-            -i out/pilot.mp4 -frames:v 1 -q:v 3 out/cover.jpg
+          npx remotion still src/index.jsx Cover out/cover.png
+          ffmpeg -hide_banner -loglevel error -y -i out/cover.png -frames:v 1 -q:v 2 out/cover.jpg
           python scripts/create_exports.py --voice-mode "$VOICE_MODE"
           test -s out/cover.jpg
           test -s out/popisek.txt
@@ -80,10 +82,11 @@ jobs:
           test -s out/dabing-casovani.srt
       - uses: actions/upload-artifact@v4
         with:
-          name: story-studio-pilot-a3-${{ inputs.voice_mode }}
+          name: mimo-signal-part01-${{ inputs.voice_mode }}
           path: |
             out/pilot.mp4
             out/cover.jpg
+            out/cover.png
             out/popisek.txt
             out/scenar-pro-dabing.txt
             out/dabing-casovani.srt

@@ -13,7 +13,8 @@ import wave
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SCENES = json.loads((ROOT / "storyboard.json").read_text(encoding="utf-8"))["scenes"]
+STORY = json.loads((ROOT / "storyboard.json").read_text(encoding="utf-8"))
+SCENES = STORY["scenes"]
 VOICE = ROOT / ".voice"
 VOICE.mkdir(exist_ok=True)
 MODEL = ROOT / ".voice-model" / "cs_CZ-jirka-medium.onnx"
@@ -42,9 +43,13 @@ def main():
             seconds = audio.getnframes() / audio.getframerate()
             assert audio.getnchannels() == 1 and audio.getsampwidth() == 2
         # Sound starts 1.5 s into the 12.5-s scene.
-        if seconds > 10.75:
+        allowed = 10.75
+        if i == len(SCENES) - 1:
+            # Final 2.5 seconds belong to the part-2 teaser / end card.
+            allowed = min(allowed, float(STORY["secondsPerScene"]) - 1.5 - float(STORY.get("endCardSeconds", 2.5)) - 0.1)
+        if seconds > allowed:
             sys.exit(f"Scéna {i + 1}: dabing trvá {seconds:.1f} s. "
-                     "Zkrať text narration ve storyboard.json (limit 10,75 s).")
+                     f"Zkrať narration (limit {allowed:.2f} s).")
         print(f"Scéna {i+1}: připraven český hlas, {seconds:.2f} s")
     print("Všechny hlasové stopy připraveny.")
 
